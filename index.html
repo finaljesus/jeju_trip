@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>제주 가족여행 안내</title>
+<style>
+  :root {
+    --main: #1f5fbf;
+    --main-dark: #153f80;
+    --main-light: #e8f0fc;
+    --bg: #f6f8fb;
+    --card: #ffffff;
+    --text: #1d2430;
+    --sub: #5a6577;
+    --line: #d9e0ea;
+    --warn-bg: #fff6e0;
+    --warn-line: #e3b341;
+    --warn-text: #7a5300;
+    --ok: #1f7a4d;
+  }
+  * { box-sizing: border-box; }
+  html { font-size: 18px; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Malgun Gothic", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+    line-height: 1.65;
+  }
+  header.top {
+    background: var(--main);
+    color: #fff;
+    padding: 20px 16px 16px;
+  }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 0 16px; }
+  header.top .wrap { padding: 0; }
+  header.top h1 { margin: 0 0 4px; font-size: 1.7rem; }
+  header.top p { margin: 0; opacity: 0.92; font-size: 0.95rem; }
+  nav.menu {
+    background: #fff;
+    border-bottom: 1px solid var(--line);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  nav.menu .wrap { display: flex; flex-wrap: wrap; gap: 4px; padding-top: 6px; padding-bottom: 6px; }
+  nav.menu button {
+    font: inherit;
+    font-weight: 700;
+    border: 0;
+    background: transparent;
+    color: var(--sub);
+    padding: 10px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    min-height: 44px;
+  }
+  nav.menu button:hover { background: var(--main-light); color: var(--main-dark); }
+  nav.menu button.active { background: var(--main); color: #fff; }
+  nav.menu button:focus-visible, .thumb:focus-visible, .close:focus-visible { outline: 3px solid #f0a500; outline-offset: 2px; }
+  main { padding: 20px 0 40px; }
+  section.tab { display: none; }
+  section.tab.active { display: block; }
+  h2 { font-size: 1.45rem; margin: 8px 0 12px; color: var(--main-dark); }
+  h3 { font-size: 1.15rem; margin: 0 0 6px; }
+  .banner {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-left: 8px solid var(--main);
+    border-radius: 12px;
+    padding: 16px 18px;
+    margin-bottom: 16px;
+  }
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; margin-top: 10px; }
+  .stat { background: var(--main-light); border-radius: 10px; padding: 10px 12px; }
+  .stat b { display: block; color: var(--sub); font-size: 0.8rem; font-weight: 600; }
+  .stat span { font-size: 1.05rem; font-weight: 700; color: var(--main-dark); }
+  .notice {
+    background: var(--warn-bg);
+    border: 1px solid var(--warn-line);
+    color: var(--warn-text);
+    border-radius: 10px;
+    padding: 10px 14px;
+    margin: 12px 0;
+    font-size: 0.95rem;
+  }
+  .notice ul { margin: 4px 0 0; padding-left: 1.2em; }
+  .daycards { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px; margin-top: 14px; }
+  .daycard {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 14px;
+    text-align: left;
+    font: inherit;
+    cursor: pointer;
+    color: inherit;
+  }
+  .daycard:hover { border-color: var(--main); box-shadow: 0 2px 10px rgba(31,95,191,0.15); }
+  .daycard strong { display: block; color: var(--main-dark); font-size: 1.1rem; }
+  .daycard small { color: var(--sub); }
+  table { width: 100%; border-collapse: collapse; background: var(--card); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+  th { background: var(--main); color: #fff; text-align: left; padding: 10px 12px; font-size: 0.95rem; }
+  td { padding: 10px 12px; border-top: 1px solid var(--line); vertical-align: top; font-size: 0.97rem; }
+  td.time { white-space: nowrap; font-weight: 700; color: var(--main-dark); width: 6.5em; }
+  td.plan { font-weight: 700; width: 30%; }
+  td.num, th.num { text-align: right; white-space: nowrap; }
+  .tablewrap { overflow-x: auto; }
+  .place {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 16px;
+    margin: 16px 0;
+  }
+  .place header { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: baseline; margin-bottom: 8px; }
+  .place .when { background: var(--main); color: #fff; border-radius: 20px; padding: 2px 12px; font-size: 0.85rem; font-weight: 700; }
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0 10px; }
+  .tag { background: var(--main-light); color: var(--main-dark); border-radius: 14px; padding: 1px 10px; font-size: 0.85rem; }
+  .photos { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 8px; margin: 10px 0; }
+  .thumb {
+    border: 0; padding: 0; background: #dfe6f0; border-radius: 10px; overflow: hidden; cursor: zoom-in;
+    aspect-ratio: 4 / 3; display: block; width: 100%;
+  }
+  .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .photonote { color: var(--sub); font-size: 0.82rem; margin: 0 0 8px; }
+  dl.info { display: grid; grid-template-columns: 7.5em 1fr; gap: 4px 10px; margin: 8px 0; font-size: 0.95rem; }
+  dl.info dt { color: var(--sub); font-weight: 700; }
+  dl.info dd { margin: 0; }
+  .check { color: var(--warn-text); }
+  .src { font-size: 0.82rem; color: var(--sub); word-break: break-all; }
+  .src a { color: var(--main); }
+  .bars { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; margin: 14px 0; }
+  .barrow { display: grid; grid-template-columns: 9em 1fr 8.5em; gap: 10px; align-items: center; margin: 8px 0; font-size: 0.95rem; }
+  .track { position: relative; height: 18px; background: #e6ebf3; border-radius: 9px; }
+  .fill { position: absolute; top: 0; bottom: 0; background: var(--main); border-radius: 9px; opacity: 0.85; }
+  .limit { position: absolute; top: -4px; bottom: -4px; width: 3px; background: #c0392b; }
+  .totalrow td { font-weight: 800; background: var(--main-light); }
+  .legend { font-size: 0.85rem; color: var(--sub); }
+  .two { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px; }
+  .box { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; }
+  .box ul { margin: 6px 0 0; padding-left: 1.2em; }
+  .box li { margin: 4px 0; }
+  footer.bottom { background: #fff; border-top: 1px solid var(--line); padding: 18px 0 28px; color: var(--sub); font-size: 0.9rem; }
+  footer.bottom ul { margin: 6px 0 0; padding-left: 1.2em; }
+  .lightbox {
+    position: fixed; inset: 0; background: rgba(10, 18, 30, 0.88); z-index: 50;
+    display: none; align-items: center; justify-content: center; padding: 16px; flex-direction: column;
+  }
+  .lightbox.open { display: flex; }
+  .lightbox img { max-width: 100%; max-height: 82vh; border-radius: 8px; }
+  .lightbox p { color: #fff; margin: 10px 0 0; text-align: center; font-size: 0.95rem; }
+  .close { position: absolute; top: 12px; right: 12px; font: inherit; font-weight: 700; background: #fff; border: 0; border-radius: 8px; padding: 10px 16px; cursor: pointer; min-height: 44px; }
+  @media (max-width: 640px) {
+    html { font-size: 17px; }
+    .barrow { grid-template-columns: 1fr; gap: 2px; }
+    dl.info { grid-template-columns: 1fr; }
+    dl.info dt { margin-top: 4px; }
+    td.plan { width: auto; }
+  }
+  @media print {
+    nav.menu, .lightbox { display: none !important; }
+    section.tab { display: block !important; page-break-after: always; }
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <h1>제주도 가족여행 안내</h1>
+    <p>2026-12-01(화) ~ 2026-12-04(금), 3박 4일, 4명 (부부와 부모님)</p>
+  </div>
+</header>
+
+<nav class="menu" aria-label="메뉴">
+  <div class="wrap" id="menu"></div>
+</nav>
+
+<main>
+  <div class="wrap" id="content"></div>
+</main>
+
+<footer class="bottom">
+  <div class="wrap">
+    <b>출발 전에 꼭 확인하세요</b>
+    <ul>
+      <li>영업시간, 입장료, 가격은 자료를 모은 시점의 내용입니다. 가기 전에 최신 정보를 확인해야 합니다.</li>
+      <li>가는 비행기 시간은 아직 정해지지 않았습니다. 1일차는 "오전 10시 전후 제주 도착"으로 가정했습니다.</li>
+      <li>숙소 이름, 방 개수는 아직 정해지지 않았습니다.</li>
+      <li>사진은 한국관광공사, 제주관광공사, 서귀포시, 장소 공식 홈페이지의 사진이며 개인 여행 준비용으로만 쓰세요.</li>
+    </ul>
+  </div>
+</footer>
+
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="사진 크게 보기">
+  <button class="close" id="lbclose">닫기</button>
+  <img id="lbimg" alt="">
+  <p id="lbcap"></p>
+</div>
+
+<script>
+/* ===== 자료 (Schedule.md, Research 폴더 내용을 옮겨 적은 것) ===== */
+var SUMMARY = [
+  ["기간", "2026-12-01 ~ 12-04 (3박 4일)"],
+  ["인원", "4명 (부부 + 부모님)"],
+  ["총 예산", "약 200만원 (모든 비용 합계)"],
+  ["출발", "대구공항 (비행기)"],
+  ["숙박", "중문관광단지 3박"],
+  ["이동", "렌터카"]
+];
+
+var DAYS = [
+  {
+    id: "day1", label: "1일차", date: "12/1 화", title: "도착, 서쪽에서 중문으로", folder: "1일차",
+    rows: [
+      ["오전", "대구공항 출발, 제주공항 도착", "비행기 시간 미정"],
+      ["11:00", "렌터카 받기", "공항 근처 렌터카 하우스에서 받기"],
+      ["12:00", "점심: 제주 고기국수", "공항 근처 국수집 (예: 올래국수, 영업 정보는 확인하지 못함)"],
+      ["14:00", "오설록 티뮤지엄", "차에서 내려 가까움, 녹차밭 산책은 짧게"],
+      ["16:00", "카멜리아힐", "12월은 동백꽃 철, 입구 가까이만 천천히"],
+      ["17:30", "중문 숙소 체크인", "짐 풀고 쉬기"],
+      ["18:30", "저녁: 흑돼지 구이", "목포고을 (kg당 75,000원부터라는 후기, 4명이면 약 1kg 안팎). 값을 아끼려면 돈이랑 (1인 300g 단위). 가격은 옛 자료라 확인 필요"]
+    ],
+    notes: [],
+    places: [
+      {
+        name: "오설록 티뮤지엄", when: "14:00", base: "오설록티뮤지엄", ext: "jpg", n: 3,
+        tags: ["녹차밭", "걷기적음", "관람무료"],
+        desc: "아모레퍼시픽이 차 문화를 소개하고 널리 알리려고 2001년 9월에 연 국내 최초의 차 박물관입니다.",
+        info: [
+          ["주소", "제주특별자치도 서귀포시 안덕면 신화역사로 15"],
+          ["운영시간", "동절기 09:00~18:00 (기상이 나쁘면 변경될 수 있음)"],
+          ["입장료", "관람 무료, 체험 프로그램은 별도 요금"],
+          ["주차", "무료"],
+          ["예상 비용", "무료 (체험이나 차 구입은 별도)"]
+        ],
+        check: "체험 프로그램 요금과 12월 1일 운영시간 변경 여부는 확인하지 못했습니다.",
+        src: [["한국 여행 정보 사이트", "https://www.ktriptips.com/kor/culture/2660802"]],
+        photonote: "한국관광공사 사진 서버의 사진. 사진 속 모습은 직접 확인하지 못했습니다."
+      },
+      {
+        name: "카멜리아힐", when: "16:00", base: "카멜리아힐", ext: "jpg", n: 3,
+        tags: ["동백", "입구근처만", "해지기전"],
+        desc: "동백꽃으로 알려진 수목원입니다. 12월은 동백꽃 철이라 일정에 넣었고, 부모님이 힘들면 입구 가까이만 둘러봅니다.",
+        info: [
+          ["주소", "제주도 서귀포시 안덕면 병악로 166 (공식 홈페이지)"],
+          ["전화", "064-759-0088 (공식 홈페이지)"],
+          ["운영시간", "동절기 08:30~19:00 (한 여행 블로그 기준, 공식 확인 필요)"],
+          ["입장료", "공식 요금을 확인하지 못함 (판매 사이트에는 7,000원부터 표시)"],
+          ["예상 비용", "4명 약 3만원 안팎으로 추정 (확인 필요)"]
+        ],
+        check: "공식 입장료, 12월 동백 개화 상태, 입구에서 가까운 구간의 걷는 거리를 확인하지 못했습니다. 16:00 도착이면 해가 일찍 져서 볼 시간이 짧을 수 있습니다. 사진 3은 가을 풍경입니다.",
+        src: [["카멜리아힐 공식 홈페이지", "https://www.camelliahill.co.kr/"]],
+        photonote: "공식 홈페이지의 사진. 사진 속 모습은 직접 확인하지 못했습니다."
+      }
+    ]
+  },
+  {
+    id: "day2", label: "2일차", date: "12/2 수", title: "한라산 드라이브, 중문관광단지", folder: "2일차",
+    rows: [
+      ["08:00", "숙소 출발", "출발 전에 1100도로 통제 여부와 영실 탐방 시간을 확인 (한라산국립공원사무소 064-713-9951)"],
+      ["09:00", "영실 (차로 올라갈 수 있는 곳까지)", "영실 탐방 시간이 겨울에 12시까지라는 자료가 있어 오전 일찍으로 당김. 차로 해발 1,280m 근처까지 가서 경치만 보기. 정상 등반은 하지 않음. 길이 열려 있을 때만"],
+      ["10:30", "1100고지 휴게소와 습지", "영실에서 1100고지 쪽으로 약 4km. 차로 도착, 평평한 데크길(약 675m, 20~30분) 짧게 걷기. 눈 쌓인 한라산 구경"],
+      ["12:30", "점심: 서귀포 쪽 식당", "한라산에서 내려오는 길"],
+      ["14:30", "천제연폭포", "중문관광단지, 계단이 있어 천천히"],
+      ["16:00", "주상절리대", "전망대에서 바다 구경, 걷기 짧음"],
+      ["17:00", "숙소에서 휴식", ""],
+      ["18:30", "저녁: 갈치조림", "이조은 식당 (갈치정식 2인 60,000원이라는 후기, 4명이면 약 12만원) 또는 덤장 중문점 (3인 세트 90,000원이라는 후기, 4명이면 추가 주문 필요). 가격은 옛 자료라 확인 필요"]
+    ],
+    notes: [
+      "한라산 길이 막히면 오전에 여미지식물원으로 바꿉니다. (실내 온실이 있다는 것은 확인하지 못한 내용입니다.)",
+      "영실 탐방 시간(겨울 05:00~12:00)은 출처가 확실하지 않은 자료입니다. 차로 갈 수 있는 곳까지만 가는 것이라 시간 제한이 적용되는지도 확인이 필요합니다.",
+      "중문 숙소에서 영실까지 가는 시간(약 1시간)은 제가 가정한 값이고 확인하지 못했습니다."
+    ],
+    places: [
+      {
+        name: "영실 (한라산)", when: "09:00", base: "영실휴게소", ext: "jpg", n: 3,
+        tags: ["한라산", "차로가는곳까지", "눈길주의"],
+        desc: "영실 등산로는 길이 5.8km, 2시간 30분이 걸리는 코스로 한라산 코스 중 가장 짧으면서 아름다운 구간으로 꼽힙니다. 이번에는 걷지 않고, 차로 갈 수 있는 곳까지만 올라가 경치를 봅니다.",
+        info: [
+          ["주소", "제주특별자치도 서귀포시 영실로 246"],
+          ["문의", "064-747-9950 (사이트 기재), 한라산국립공원사무소 064-713-9951"],
+          ["운영", "연중무휴, 주차 가능, 탐방안내소와 매점 등 (사이트 기재)"],
+          ["차로 갈 수 있는 곳", "해발 1,280m 고지까지 (사이트 기재)"],
+          ["예상 비용", "입장료 무료라는 자료가 있음 (확인 필요)"]
+        ],
+        check: "겨울 탐방 시간이 05:00~12:00이라는 자료가 있으나 출처가 확실하지 않습니다. 눈이 오면 도로 통제나 체인이 필요할 수 있습니다. 영실은 가을 단풍으로 유명해서 사진이 겨울 모습이 아닐 수 있습니다.",
+        src: [["한국 여행 정보 사이트", "https://www.ktriptips.com/kor/tourspot/126469"]],
+        photonote: "한국관광공사 사진 서버의 사진. 영실 휴게소만 소개한 사진이 아니라 영실 탐방로 사진입니다."
+      },
+      {
+        name: "1100고지 휴게소와 습지", when: "10:30", base: "1100고지습지", ext: "jpg", n: 3,
+        tags: ["한라산", "평평한데크길", "람사르습지"],
+        desc: "한라산 고원지대의 대표적인 산지 습지로 2009년 람사르 습지로 등록되었습니다. 휴게소 맞은편에 약 675m 나무 데크길이 있고 경사가 거의 없어 한 바퀴 20~30분 걸립니다.",
+        info: [
+          ["주소", "서귀포시 1100로 1555"],
+          ["운영시간", "상시 개방"],
+          ["입장료", "무료"],
+          ["주차", "무료이지만 좁아서 붐비면 금방 찹니다"],
+          ["예상 비용", "무료"]
+        ],
+        check: "눈이 많이 오면 1100도로가 통제되고 체인이 필요할 수 있습니다. 겨울에는 휴게소 화장실이 얼지 않게 닫혀 있을 수 있습니다. 가기 전에 제주경찰청 교통통제 상황과 한라산국립공원 공지를 확인하세요. 2026년 12월 기준 통제 정보는 확인하지 못했습니다.",
+        src: [["한국 여행 정보 사이트", "https://www.ktriptips.com/kor/tourspot/1861656"], ["제주 눈길 운전 안내", "https://www.jeju.com/blog/jeju-snow-road-cctv"]],
+        photonote: "한국관광공사 사진 서버의 사진. 눈 쌓인 겨울 모습인지 알 수 없습니다."
+      },
+      {
+        name: "천제연폭포", when: "14:30", base: "천제연폭포", ext: "jpg", n: 3,
+        tags: ["중문관광단지", "계단있음", "무료주차"],
+        desc: "한라산에서 시작된 중문천이 바다로 흐르면서 만든 폭포로 중문관광단지 안에 있습니다. 폭포는 3개로 나뉩니다.",
+        info: [
+          ["주소", "제주 서귀포시 천제연로 132 (중문동)"],
+          ["운영시간", "출처마다 다름: 09:00~17:50 (입장 마감 17:10), 09:00~17:20, 09:00~18:00"],
+          ["입장료", "만 25세 이상 2,500원, 만 25세 미만 1,350원"],
+          ["주차", "무료 주차장이 있다는 후기"],
+          ["예상 비용", "성인 4명 약 1만원"]
+        ],
+        check: "계단이 있어 부모님과 천천히 이동하세요. 운영시간이 출처마다 달라서 해가 짧은 12월에는 마감 시간을 미리 확인해야 합니다.",
+        src: [["한국 여행 정보 사이트", "https://www.ktriptips.com/kor/tourspot/126439"], ["트래지 안내", "https://www.trazy.com/ko/spot/693/cheonjeyeon-falls-%EC%B2%9C%EC%A0%9C%EC%97%B0-%ED%8F%AD%ED%8F%AC"]],
+        photonote: "한국관광공사 사진 서버의 사진. 사진 속 모습은 직접 확인하지 못했습니다."
+      },
+      {
+        name: "대포주상절리대", when: "16:00", base: "대포주상절리대", ext: "jpg", n: 3,
+        tags: ["중문관광단지", "바다전망", "천연기념물"],
+        desc: "중문관광단지 동쪽 해안가에 있는 주상절리대로, 검붉은 육각형 돌기둥이 병풍처럼 둘러서 있고 파도가 부서지는 곳입니다. 천연기념물 제443호입니다.",
+        info: [
+          ["운영시간", "한 목록에 09:00~17:30, 연중무휴라고 나와 있음 (공식 확인 못 함)"],
+          ["입장료", "한 목록에 성인 2,000원이라고 나와 있음 (공식 확인 못 함)"],
+          ["예상 비용", "성인 4명 약 8,000원 (확인 필요)"]
+        ],
+        check: "정확한 주소와 주차 정보는 확인하지 못했습니다. 12월은 해가 일찍 져서 16:00 방문이면 마감까지 시간이 짧을 수 있습니다. 바람이 센 날은 전망대 안전 안내를 확인하세요. 일정표의 걷기 짧음은 검색으로 확인한 내용이 아닙니다.",
+        src: [["한국 여행 정보 사이트", "https://www.ktriptips.com/kor/tourspot/127053"]],
+        photonote: "한국관광공사 사진 서버의 사진. 사진 속 모습은 직접 확인하지 못했습니다."
+      },
+      {
+        name: "여미지식물원 (한라산이 막혔을 때 대체 코스)", when: "대체", base: "여미지식물원", ext: "jpg", n: 3,
+        tags: ["대체코스", "중문관광단지"],
+        desc: "한라산 길이 막혔을 때 오전에 가는 곳입니다.",
+        info: [
+          ["주소", "제주특별자치도 서귀포시 중문관광로 93 (색달동)"],
+          ["입장료", "성인 12,000원이라는 제3자 사이트 자료가 있음 (공식 확인 못 함)"],
+          ["운영시간", "09:00~18:00 (입장 마감 17:30)이라는 글이 있으나 이 장소의 정보인지 확실하지 않음"],
+          ["예상 비용", "성인 4명 약 4만8천원 (확인 필요)"]
+        ],
+        check: "온실이 있는지, 걷는 양이 어느 정도인지 확인하지 못했습니다. 공식 사이트 주소로 알려진 곳은 yeomiji.or.kr 입니다.",
+        src: [["한국 여행 정보 사이트", "https://www.ktriptips.com/kor/tourspot/126464"]],
+        photonote: "한국관광공사 사진 서버의 사진. 사진 속 모습은 직접 확인하지 못했습니다."
+      }
+    ]
+  },
+  {
+    id: "day3", label: "3일차", date: "12/3 목", title: "남서쪽 해안 드라이브", folder: "3일차",
+    rows: [
+      ["09:00", "숙소 출발", ""],
+      ["09:40", "산방산과 사계해안", "차창 구경과 짧은 사진 촬영"],
+      ["10:40", "송악산 전망", "둘레길 전체는 걷지 않고 전망 지점만"],
+      ["12:00", "점심: 모슬포 방어", "항구식당 (방어회와 방어 지리탕). 가격은 확인하지 못했고, 12월 방어 시세가 오르는 때라 전화로 먼저 물어보기. 비싸면 방어 지리탕만 먹기"],
+      ["14:00", "협재해변", "평지 해변, 카페에서 쉬기"],
+      ["16:00", "카페에서 휴식", "바다 보이는 카페"],
+      ["17:30", "중문 숙소로 돌아오기", ""],
+      ["18:30", "저녁: 자유 (숙소 근처)", "전날과 다른 음식"]
+    ],
+    notes: [],
+    places: [
+      {
+        name: "산방산", when: "09:40", base: "산방산", ext: "webp", n: 3,
+        tags: ["차창구경", "사진촬영", "입장료무료"],
+        desc: "산방산은 높이 약 345m의 종 모양 화산체입니다. 제주관광공사는 산방산과 용머리해안을 중심으로 제주 서남부의 화산 지형과 해안 지질을 보는 코스로 안내합니다.",
+        info: [
+          ["입장료", "산방산 자체는 무료라고 소개됨"],
+          ["주차", "가능하지만 공간이 좁다는 주의가 있음"],
+          ["예상 비용", "무료"]
+        ],
+        check: "사진 속 용머리해안은 일정표에 없는 곳입니다. 참고용 풍경입니다. 산방산 단독 공식 페이지는 찾지 못했고, 사진은 산방산 용머리해안 지질트레일 안내 페이지의 것입니다.",
+        src: [["제주관광공사 비짓제주", "https://www.visitjeju.net/kr/detail/view?contentsid=CNTS_000000000021380"], ["서귀포시 E-Ticket 산방산 안내", "https://eticket.seogwipo.go.kr/contents?bmcode=sanbangsan"]],
+        photonote: "제주관광공사 공식 페이지의 사진. 사진 설명은 공식 페이지의 사진 설명 문구를 근거로 했습니다."
+      },
+      {
+        name: "사계해안", when: "09:40", base: "사계해안", ext: "jpg", n: 3,
+        tags: ["해안도로", "가파도마라도", "수영불가"],
+        desc: "안덕면 사계리 일대 해안도로 옆 해변으로 위도로 보면 우리나라에서 가장 남쪽에 있는 해변이라고 소개됩니다. 가파도와 마라도가 보입니다. 해수욕은 할 수 없습니다.",
+        info: [
+          ["사계해안도로", "사계리(산방산)와 대정읍 상모리(송악산) 사이를 잇는 약 10km 길"],
+          ["예상 비용", "무료"]
+        ],
+        check: "주차와 걷는 거리, 소요시간은 확인하지 못했습니다.",
+        src: [["한국 여행 정보 사이트", "http://www.koreatriptips.com/tourist-attractions/2791438.html"]],
+        photonote: "한국관광공사 사진 서버의 사진. 페이지에서 사진 설명 문구가 사계해안으로 되어 있음을 확인했습니다."
+      },
+      {
+        name: "송악산 전망", when: "10:40", base: "송악산", ext: "jpg", n: 3,
+        tags: ["전망", "바람주의", "입장료무료"],
+        desc: "바닷속 화산 활동으로 만들어진 산입니다. 전망대에서는 가까이 마라도, 가파도, 형제섬이 보이고 멀리 산방산과 한라산이 보입니다. 이번에는 둘레길 전체를 걷지 않고 전망 지점까지만 갑니다.",
+        info: [
+          ["둘레길", "약 2.8km 순환, 한 바퀴 1시간~2시간. 경사가 완만하고 바람이 많이 불 수 있음"],
+          ["입장료", "무료, 화장실 있음"],
+          ["주소", "서귀포시 대정읍 상모리 일대"],
+          ["예상 비용", "무료"]
+        ],
+        check: "12월 바람이 차가우니 따뜻하게 입으세요. 둘레길 중간에는 화장실이 없다는 정보가 있습니다. 송악산 정상 출입 제한은 특정 시기에만 해당하므로 최신 상황을 확인하세요.",
+        src: [["한국 여행 정보 사이트", "https://www.ktriptips.com/kor/tourspot/1768982"], ["송악산 둘레길 안내", "https://www.trvlogue.com/ko/jeju-songaksan-trail-guide"]],
+        photonote: "한국관광공사 사진 서버의 사진. 사진 속 모습은 직접 확인하지 못했습니다."
+      },
+      {
+        name: "협재해변", when: "14:00", base: "협재해변", ext: "jpg", n: 3,
+        tags: ["해변", "비양도", "카페"],
+        desc: "조개껍질 가루가 많이 섞인 백사장과 앞바다에 떠 있는 비양도, 코발트빛 바다가 어우러진 해변입니다. 수심이 얕고 경사가 완만해서 가족이 가기에 알맞다고 소개됩니다.",
+        info: [
+          ["주소", "제주시 한림읍 한림로 329-10"],
+          ["문의", "064-728-3981"],
+          ["운영", "상시 개방, 연중무휴, 주차 가능 (주차비는 확인하지 못함)"],
+          ["시설", "탈의실, 샤워실, 휴게소, 식수대, 화장실"],
+          ["예상 비용", "무료 (카페 비용은 별도)"]
+        ],
+        check: "사진이 여름 해수욕 모습일 수 있어 12월과 다를 수 있습니다. 카페 이름은 아직 정하지 않았습니다. 중문 숙소에서 협재까지 약 45분은 가정한 값입니다.",
+        src: [["한국 여행 정보 사이트", "https://www.ktriptips.com/kor/tourspot/127490"]],
+        photonote: "한국관광공사 사진 서버의 사진. 사진 속 모습은 직접 확인하지 못했습니다."
+      }
+    ]
+  },
+  {
+    id: "day4", label: "4일차", date: "12/4 금", title: "서귀포 구경 후 귀국", folder: "4일차",
+    rows: [
+      ["09:00", "숙소 체크아웃, 짐은 차에 싣기", ""],
+      ["09:30", "천지연폭포", "서귀포, 가까이에 주차하고 짧게 걷기"],
+      ["11:00", "서귀포 매일올레시장", "간식, 귤 같은 선물 사기"],
+      ["12:30", "점심: 시장 근처 식당", ""],
+      ["14:00", "제주시로 이동", "약 1시간"],
+      ["15:00", "동문시장 또는 쇼핑", "기념품 사기"],
+      ["16:00", "기름 넣고 렌터카 반납", "반납 장소와 시간 미리 확인"],
+      ["16:30", "제주공항 도착, 짐 부치기", "비행기 출발 최소 1시간 전"],
+      ["18:00 이후", "제주공항 출발, 대구공항 도착", "비행기 시간 미정"]
+    ],
+    notes: [],
+    places: [
+      {
+        name: "천지연폭포", when: "09:30", base: "천지연폭포", ext: "jpg", n: 1,
+        tags: ["서귀포", "짧게걷기", "폭포"],
+        desc: "기암절벽 위에서 쏟아져 내리는 하얀 물기둥으로 높이 22m, 폭 12m입니다. 계곡에는 천연기념물 제163호 담팔수나무와 난대성 식물이 자라고, 천연기념물 제27호 무태장어가 삽니다.",
+        info: [
+          ["관람시간", "09:00~22:00 (입장마감 21:20), 서귀포시 공식 페이지 기재"],
+          ["입장료", "일반 2,000원, 청소년과 어린이 1,000원"],
+          ["문의", "064-733-1528 (공식 페이지 기재)"],
+          ["주차", "무료라는 기사와 약 230대 유료라는 블로그가 엇갈림"],
+          ["예상 비용", "성인 4명 약 8,000원"]
+        ],
+        check: "공식 출처에서 사진을 1장만 찾았습니다. 주차장에서 폭포까지 걷는 거리는 확인하지 못했습니다.",
+        src: [["서귀포시 E-Ticket", "https://eticket.seogwipo.go.kr/contents?bmcode=cheonjiyeon"]],
+        photonote: "서귀포시 공식 페이지 포토갤러리의 유일한 사진. 사진 속 모습은 확인하지 못했습니다."
+      },
+      {
+        name: "서귀포 매일올레시장", when: "11:00", base: "서귀포매일올레시장", ext: "jpg", n: 3,
+        tags: ["시장", "간식", "귤선물"],
+        desc: "서귀포에서 가장 큰 시장입니다. 1960년대 초에 생겼고 2001년부터 상가가 넓어져 길이가 620m가 넘습니다. 농산물, 수산물, 생활용품을 많이 팔고 연중무휴입니다.",
+        info: [
+          ["주소", "서귀포시 중앙로62번길 18"],
+          ["영업시간", "여름 07:00~21:00, 겨울 07:00~20:00 (사이트 기재)"],
+          ["규모", "점포 237개 (서귀포시 전통시장 목록, 2026.8 기준)"],
+          ["예상 비용", "간식과 선물, 점심은 식비에 포함"]
+        ],
+        check: "시장 운영시간은 사이트 기재 내용이라 확인이 필요합니다. 주차장 위치와 요금은 확인하지 못했습니다. 점심 식당은 아직 정하지 않았습니다. 일부 사진은 오래된 것일 수 있습니다.",
+        src: [["한국 여행 정보 사이트", "https://www.ktriptips.com/kor/shopping/1023956"]],
+        photonote: "한국관광공사 사진 서버의 사진. 사진 속 모습은 직접 확인하지 못했습니다."
+      },
+      {
+        name: "동문시장 (동문재래시장)", when: "15:00", base: "동문시장", ext: "jpg", n: 3,
+        tags: ["시장", "기념품", "제주시"],
+        desc: "제주시의 대표적인 전통 재래시장입니다. 1945년 광복 직후 생겼고 1954년 큰 불이 난 뒤 지금 자리로 옮겼습니다. 신선한 해산물이 특히 인기이며 상가는 약 300곳입니다.",
+        info: [
+          ["주소", "제주시 관덕로14길 20"],
+          ["영업시간", "08:00~21:00 (사이트 기재)"],
+          ["예상 비용", "기념품은 기타 비용에 포함"]
+        ],
+        check: "주차장 위치와 요금, 시장에서 렌터카 반납 장소까지 걸리는 시간은 확인하지 못했습니다. 일정이 빠듯하면 시장 대신 공항 쇼핑으로 바꿀 수 있습니다. (귀국 18시 이후, 공항 도착 16:30 목표)",
+        src: [["한국 여행 정보 사이트", "https://www.ktriptips.com/kor/shopping/1018338"]],
+        photonote: "한국관광공사 사진 서버의 사진. 사진 속 모습은 직접 확인하지 못했습니다."
+      }
+    ]
+  }
+];
+
+var BUDGET = [
+  ["항공권 (4명 왕복)", 20, 40, "대구 출발 제주행 최저가 약 4만5천원, 티웨이 왕복 4만9천원부터. 화요일(12/1)이 가장 싼 요일. 실제 12/1 가격은 확인 못 함"],
+  ["숙박 (3박)", 30, 55, "1박 10만~18만원으로 가정한 값. 실제 12월 가격은 확인 못 함"],
+  ["렌터카 (4일) + 보험 + 기름값", 30, 45, "한 가이드의 중형 세단 예시 32만~46만원. 12월은 비싼 달이라는 집계도 있음"],
+  ["식비 (3박 4일)", 40, 50, "갈치정식 2인 6만원, 흑돼지 kg당 7만5천원 후기 기준"],
+  ["입장료", 5, 10, "오설록, 카멜리아힐, 천제연 등"],
+  ["기타 (간식, 선물, 주차)", 10, 15, ""]
+];
+var LIMIT = 200;
+
+var FOOD = [
+  ["흑돼지", [
+    ["목포고을", "연탄구이. kg당 75,000원부터라는 후기", "1일차 저녁 후보"],
+    ["돈이랑", "1인 300g, 2인 600g 단위 (2021년 기사, 가격 확인 필요)", "값을 아끼고 싶을 때"],
+    ["숙성도 중문점", "주차장 넓음, 그릴링 서비스", "후보"]
+  ]],
+  ["갈치조림", [
+    ["이조은 식당", "갈치정식 2인 60,000원 (갈치회, 구이, 조림). 4명이면 약 12만원", "2일차 저녁 후보"],
+    ["덤장 중문점", "3인 세트 90,000원 (돔베고기, 보말미역국, 갈치조림, 고등어). 4명이면 추가 주문 필요", "2일차 저녁 후보"]
+  ]],
+  ["방어", [
+    ["모슬포 항구식당", "방어 활어회와 방어 지리탕. 가격은 확인하지 못함", "3일차 점심. 12월 방어 시세가 오르는 때라 전화로 먼저 물어보기"]
+  ]]
+];
+
+var LODGE = [
+  ["켄싱턴리조트 제주중문", "서귀포시 중문관광로72번길 29-29. 주방, 야외수영장, 조식 뷔페"],
+  ["씨사이드 아덴 중문", "주방, 바다전망 객실, 야외수영장"]
+];
+
+/* ===== 화면 만들기 ===== */
+function esc(s) {
+  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+function man(n) { return n + "만원"; }
+
+var TABS = [
+  { id: "all", label: "전체" },
+  { id: "day1", label: "1일차" },
+  { id: "day2", label: "2일차" },
+  { id: "day3", label: "3일차" },
+  { id: "day4", label: "4일차" },
+  { id: "budget", label: "예산" },
+  { id: "food", label: "숙소와 맛집" }
+];
+
+function renderOverview() {
+  var h = '<section class="tab" id="tab-all" aria-label="전체">';
+  h += '<div class="banner"><h2 style="margin-top:0">여행 요약</h2><div class="stats">';
+  SUMMARY.forEach(function (s) {
+    h += '<div class="stat"><b>' + esc(s[0]) + '</b><span>' + esc(s[1]) + '</span></div>';
+  });
+  h += '</div></div>';
+  h += '<div class="notice"><b>먼저 알아 둘 것</b><ul>' +
+    '<li>가는 비행기 시간이 정해지지 않아서 1일차는 "오전 10시 전후 제주 도착"으로 가정했습니다.</li>' +
+    '<li>장소 영업시간, 입장료, 가격은 가기 전에 꼭 최신 정보를 확인해야 합니다.</li>' +
+    '<li>한라산은 12월에 눈과 얼음 때문에 도로나 탐방로가 막힐 수 있습니다. 2일차에 막혔을 때 바꿀 계획이 있습니다.</li>' +
+    '<li>걷기는 적게, 차로 이동해서 가까이 내려 구경하는 일정입니다. 한라산 정상 등반은 하지 않습니다.</li>' +
+    '</ul></div>';
+  h += '<h2>일차별 보기</h2><div class="daycards">';
+  DAYS.forEach(function (d) {
+    h += '<button class="daycard" data-go="' + d.id + '"><strong>' + esc(d.label) + ' (' + esc(d.date) + ')</strong>' +
+      esc(d.title) + '<br><small>장소 ' + d.places.length + '곳</small></button>';
+  });
+  h += '</div>';
+  h += '<h2>4일 일정 한눈에</h2>';
+  DAYS.forEach(function (d) {
+    h += '<h3>' + esc(d.label) + ' (' + esc(d.date) + ') ' + esc(d.title) + '</h3>' + scheduleTable(d);
+  });
+  h += '</section>';
+  return h;
+}
+
+function scheduleTable(d) {
+  var h = '<div class="tablewrap"><table><thead><tr><th>시간</th><th>일정</th><th>메모</th></tr></thead><tbody>';
+  d.rows.forEach(function (r) {
+    h += '<tr><td class="time">' + esc(r[0]) + '</td><td class="plan">' + esc(r[1]) + '</td><td>' + esc(r[2]) + '</td></tr>';
+  });
+  return h + '</tbody></table></div>';
+}
+
+function photoPaths(d, p) {
+  var list = [];
+  for (var i = 1; i <= p.n; i++) {
+    list.push("../Research/" + d.folder + "/사진/" + p.base + "_" + i + "." + p.ext);
+  }
+  return list;
+}
+
+function renderPlace(d, p) {
+  var h = '<article class="place"><header><h3>' + esc(p.name) + '</h3><span class="when">' + esc(p.when) + '</span></header>';
+  h += '<div class="tags">';
+  p.tags.forEach(function (t) { h += '<span class="tag">#' + esc(t) + '</span>'; });
+  h += '</div>';
+  h += '<p>' + esc(p.desc) + '</p>';
+  h += '<div class="photos">';
+  photoPaths(d, p).forEach(function (src, i) {
+    h += '<button class="thumb" data-src="' + esc(src) + '" data-cap="' + esc(p.name + " 사진 " + (i + 1)) + '" aria-label="' +
+      esc(p.name) + ' 사진 ' + (i + 1) + ' 크게 보기"><img src="' + esc(src) + '" alt="' + esc(p.name) + ' 사진 ' + (i + 1) + '"></button>';
+  });
+  h += '</div><p class="photonote">' + esc(p.photonote) + '</p>';
+  h += '<dl class="info">';
+  p.info.forEach(function (r) { h += '<dt>' + esc(r[0]) + '</dt><dd>' + esc(r[1]) + '</dd>'; });
+  h += '</dl>';
+  h += '<p class="check"><b>확인 필요:</b> ' + esc(p.check) + '</p>';
+  h += '<p class="src">출처: ';
+  h += p.src.map(function (s) { return '<a href="' + esc(s[1]) + '" target="_blank" rel="noopener">' + esc(s[0]) + '</a>'; }).join(", ");
+  h += '</p></article>';
+  return h;
+}
+
+function renderDay(d) {
+  var h = '<section class="tab" id="tab-' + d.id + '" aria-label="' + esc(d.label) + '">';
+  h += '<h2>' + esc(d.label) + ' (' + esc(d.date) + ') ' + esc(d.title) + '</h2>';
+  h += scheduleTable(d);
+  if (d.notes.length) {
+    h += '<div class="notice"><ul>';
+    d.notes.forEach(function (n) { h += '<li>' + esc(n) + '</li>'; });
+    h += '</ul></div>';
+  }
+  h += '<h2>방문할 곳 (' + d.places.length + '곳)</h2>';
+  d.places.forEach(function (p) { h += renderPlace(d, p); });
+  h += '</section>';
+  return h;
+}
+
+function renderBudget() {
+  var minT = 0, maxT = 0;
+  BUDGET.forEach(function (b) { minT += b[1]; maxT += b[2]; });
+  var scale = 220;
+  var h = '<section class="tab" id="tab-budget" aria-label="예산">';
+  h += '<h2>예산 대략 계산 (추정치, 확인 필요)</h2>';
+  h += '<div class="notice">아래 금액은 검색한 자료와 제가 가정한 값으로 계산한 추정치입니다. 실제 가격은 예약할 때 확인해야 합니다. 방 1개 기준입니다.</div>';
+  h += '<div class="bars"><b>항목별 예상 범위</b>';
+  BUDGET.forEach(function (b) {
+    var left = (b[1] / 60) * 100, width = ((b[2] - b[1]) / 60) * 100;
+    h += '<div class="barrow"><span>' + esc(b[0]) + '</span><div class="track"><div class="fill" style="left:' + left + '%;width:' + width + '%"></div></div><span>' + man(b[1]) + ' ~ ' + man(b[2]) + '</span></div>';
+  });
+  h += '<p class="legend">막대의 눈금은 0원부터 60만원까지입니다.</p></div>';
+  h += '<div class="bars"><b>합계와 총 예산 비교</b>';
+  var l = (minT / scale) * 100, w = ((maxT - minT) / scale) * 100, lim = (LIMIT / scale) * 100;
+  h += '<div class="barrow"><span>합계 범위</span><div class="track"><div class="fill" style="left:' + l + '%;width:' + w + '%"></div><div class="limit" style="left:' + lim + '%" title="총 예산 ' + man(LIMIT) + '"></div></div><span>' + man(minT) + ' ~ ' + man(maxT) + '</span></div>';
+  h += '<p class="legend">빨간 선은 총 예산 ' + man(LIMIT) + '입니다. 눈금은 0원부터 ' + man(scale) + '까지입니다. 합계의 위쪽 끝(' + man(maxT) + ')은 예산을 ' + man(maxT - LIMIT) + ' 넘습니다.</p></div>';
+  h += '<div class="tablewrap"><table><thead><tr><th>항목</th><th class="num">최소</th><th class="num">최대</th><th>근거와 비고</th></tr></thead><tbody>';
+  BUDGET.forEach(function (b) {
+    h += '<tr><td class="plan">' + esc(b[0]) + '</td><td class="num">' + man(b[1]) + '</td><td class="num">' + man(b[2]) + '</td><td>' + esc(b[3]) + '</td></tr>';
+  });
+  h += '<tr class="totalrow"><td>합계</td><td class="num">' + man(minT) + '</td><td class="num">' + man(maxT) + '</td><td>방을 2개 잡으면 숙박비가 늘어 ' + man(LIMIT) + '을 넘기 쉽습니다</td></tr>';
+  h += '</tbody></table></div>';
+  h += '<div class="notice"><b>예산을 맞추는 기준</b><ul>' +
+    '<li>숙박비 3박 합계가 약 45만원 이하(1박 15만원 이하)면 ' + man(LIMIT) + ' 안에 들어올 가능성이 큽니다.</li>' +
+    '<li>4명이 한 방에 잘 수 있는지(최대 인원)를 꼭 확인해야 합니다.</li></ul></div>';
+  h += '</section>';
+  return h;
+}
+
+function renderFood() {
+  var h = '<section class="tab" id="tab-food" aria-label="숙소와 맛집">';
+  h += '<h2>맛집 후보</h2><div class="notice">가격은 후기, 블로그, 기사에서 가져온 값이고 연도가 섞여 있습니다. 가기 전에 확인하세요. 저녁 6~8시에는 인기 식당 대기가 길 수 있습니다.</div>';
+  FOOD.forEach(function (g) {
+    h += '<h3>' + esc(g[0]) + '</h3><div class="tablewrap"><table><thead><tr><th>식당</th><th>확인된 내용</th><th>메모</th></tr></thead><tbody>';
+    g[1].forEach(function (r) {
+      h += '<tr><td class="plan">' + esc(r[0]) + '</td><td>' + esc(r[1]) + '</td><td>' + esc(r[2]) + '</td></tr>';
+    });
+    h += '</tbody></table></div>';
+  });
+  h += '<h2>숙소 (중문)</h2><div class="two"><div class="box"><b>이름이 확인된 곳</b><ul>';
+  LODGE.forEach(function (r) { h += '<li><b>' + esc(r[0]) + '</b>: ' + esc(r[1]) + '</li>'; });
+  h += '</ul></div><div class="box"><b>알아 둘 것</b><ul>' +
+    '<li>두 곳의 12월 요금은 검색으로 확인하지 못했습니다. 12/1~12/4 날짜를 넣어 예약 앱에서 직접 조회해야 합니다.</li>' +
+    '<li>주방이 있는 객실이면 아침이나 간식을 직접 해결해서 식비를 줄일 수 있습니다.</li>' +
+    '<li>4명이 한 방에 잘 수 있는지(최대 인원)를 꼭 확인하세요.</li></ul></div></div>';
+  h += '<h2>항공권과 렌터카</h2><div class="two"><div class="box"><b>항공권</b><ul>' +
+    '<li>대구 출발 제주행 12월 최저가 44,452원 (왕복인지 편도인지 불명)</li>' +
+    '<li>티웨이항공 왕복 49,272원부터 (기준 월 불명)</li>' +
+    '<li>화요일이 가장 싼 요일 (12/1이 화요일)</li></ul></div>' +
+    '<div class="box"><b>렌터카</b><ul>' +
+    '<li>중형 세단 4일 예시: 대여료 20만~28만원, 완전자차 6만~12만원, 연료 약 6만원, 합계 32만~46만원</li>' +
+    '<li>12월은 제주 렌터카 일 평균 요금이 가장 비싼 달이라는 집계가 있음</li>' +
+    '<li>자차 면책금 조건을 함께 확인하세요</li></ul></div></div>';
+  h += '</section>';
+  return h;
+}
+
+document.getElementById("content").innerHTML =
+  renderOverview() + DAYS.map(renderDay).join("") + renderBudget() + renderFood();
+
+var menu = document.getElementById("menu");
+TABS.forEach(function (t) {
+  var b = document.createElement("button");
+  b.type = "button";
+  b.textContent = t.label;
+  b.setAttribute("data-tab", t.id);
+  menu.appendChild(b);
+});
+
+function show(id) {
+  var found = false;
+  TABS.forEach(function (t) { if (t.id === id) found = true; });
+  if (!found) id = "all";
+  document.querySelectorAll("section.tab").forEach(function (s) {
+    s.classList.toggle("active", s.id === "tab-" + id);
+  });
+  document.querySelectorAll("#menu button").forEach(function (b) {
+    var on = b.getAttribute("data-tab") === id;
+    b.classList.toggle("active", on);
+    if (on) { b.setAttribute("aria-current", "page"); } else { b.removeAttribute("aria-current"); }
+  });
+  try { history.replaceState(null, "", "#" + id); } catch (e) {}
+  window.scrollTo(0, 0);
+}
+
+document.addEventListener("click", function (e) {
+  var t = e.target.closest("[data-tab],[data-go]");
+  if (t) { show(t.getAttribute("data-tab") || t.getAttribute("data-go")); return; }
+  var th = e.target.closest(".thumb");
+  if (th) { openBox(th.getAttribute("data-src"), th.getAttribute("data-cap")); }
+});
+
+var box = document.getElementById("lightbox");
+function openBox(src, cap) {
+  document.getElementById("lbimg").src = src;
+  document.getElementById("lbimg").alt = cap;
+  document.getElementById("lbcap").textContent = cap;
+  box.classList.add("open");
+  document.getElementById("lbclose").focus();
+}
+function closeBox() { box.classList.remove("open"); }
+document.getElementById("lbclose").addEventListener("click", closeBox);
+box.addEventListener("click", function (e) { if (e.target === box) closeBox(); });
+document.addEventListener("keydown", function (e) { if (e.key === "Escape") closeBox(); });
+
+/* 사진이 안 열리면 안내 글자를 보여 준다 */
+document.querySelectorAll(".thumb img").forEach(function (img) {
+  img.addEventListener("error", function () {
+    var p = img.parentNode;
+    p.style.cursor = "default";
+    p.innerHTML = '<span style="display:flex;height:100%;align-items:center;justify-content:center;padding:8px;text-align:center;color:#5a6577;font-size:0.85rem">사진을 불러오지 못했습니다. 사진 폴더 위치를 확인하세요.</span>';
+  });
+});
+
+show((location.hash || "").replace("#", "") || "all");
+
+/* 사진 점검용 표시 (열린 사진 수 / 전체 사진 수) */
+window.addEventListener("load", function () {
+  var imgs = document.querySelectorAll(".thumb img");
+  var ok = 0;
+  imgs.forEach(function (i) { if (i.complete && i.naturalWidth > 0) ok++; });
+  document.documentElement.setAttribute("data-photos", ok + "/" + imgs.length);
+});
+</script>
+</body>
+</html>
